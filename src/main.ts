@@ -8,7 +8,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import { validationError } from './filters/validation.errors';
 
+
 dotenv.config();
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -25,6 +27,7 @@ async function bootstrap() {
       },
     }),
   );
+
   console.log(`🚀 Server running on port ${configService.get<number>('port', 5000)}`);
   await app.listen(configService.get<number>('port', 5000));
 }
