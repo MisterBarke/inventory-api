@@ -3,8 +3,7 @@
     "builds": [
       {
         "src": "src/main.ts",
-        "use": "@vercel/node",
-        "buildCommand": "prisma generate && npm run build"
+        "use": "@vercel/node"
       }
     ],
     "routes": [
