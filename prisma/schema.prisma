@@ -23,7 +23,6 @@ model Users {
   role                       Role
 }
 
-
 enum Role {
   USER //Simple utilisateur
   ADMIN //Admin
