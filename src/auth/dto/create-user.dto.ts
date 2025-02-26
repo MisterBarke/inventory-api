@@ -49,7 +49,7 @@ export class LoginDto {
   @ApiProperty({
       type: 'string',
       name: 'password',
-      description: 'la propriété password de type string',
+      description: 'la propriété password de type string ',
       default: '',
     })
     @IsString()
