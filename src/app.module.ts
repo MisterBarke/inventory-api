@@ -10,11 +10,13 @@ import configuration from './config/configuration';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from './user/user.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
+    PrismaModule,
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     ThrottlerModule.forRootAsync({
       useFactory: (configService: ConfigService) => {
