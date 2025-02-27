@@ -11,6 +11,8 @@ import { LocalStrategy } from 'src/strategies/local.strategy';
 
 
 @Module({
+  controllers: [AuthController],
+  providers: [AuthService, LocalStrategy],
   imports: [
     PassportModule,
     PrismaModule,
@@ -30,7 +32,6 @@ import { LocalStrategy } from 'src/strategies/local.strategy';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AuthController],
-  providers: [AuthService, LocalStrategy],
+ 
 })
 export class AuthModule {}

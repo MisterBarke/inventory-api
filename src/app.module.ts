@@ -11,6 +11,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { PrismaModule } from './prisma/prisma.module';
   providers: [
     AppService,
     JwtStrategy,
+    LocalStrategy,
     {
       provide: APP_GUARD, 
       useClass: JwtAuthGuard
