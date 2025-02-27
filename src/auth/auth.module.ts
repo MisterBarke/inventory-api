@@ -25,6 +25,9 @@ import { PassportModule } from '@nestjs/passport';
       },
       inject: [ConfigService],
     }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
   ],
   controllers: [AuthController],
   providers: [AuthService],
