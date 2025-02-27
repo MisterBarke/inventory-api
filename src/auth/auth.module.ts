@@ -13,6 +13,7 @@ import { LocalStrategy } from 'src/strategies/local.strategy';
 @Module({
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy],
+  exports: [AuthService],
   imports: [
     PassportModule,
     PrismaModule,
