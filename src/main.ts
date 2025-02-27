@@ -12,13 +12,19 @@ import * as express from 'express';
 
 
 dotenv.config();
+const server = express();
+export default server;
 
 
 async function bootstrap() {
-  const server = express();
+
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
   app.use(helmet());
   app.enableCors();
+  await app.init();
+
+  // Expose NestJS en tant que handler pour Vercel
+
   app.setGlobalPrefix('api/v1');
   setupSwagger(app);
   const configService = app.get(ConfigService);
@@ -33,5 +39,6 @@ async function bootstrap() {
 
   console.log(`🚀 Server running on port ${configService.get<number>('port', 5000)}`);
   await app.listen(configService.get<number>('port', 5000));
+  
 }
 bootstrap();
