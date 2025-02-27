@@ -14,6 +14,9 @@ import { PassportModule } from '@nestjs/passport';
     PassportModule,
     PrismaModule,
     ConfigModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     JwtModule.registerAsync({
       useFactory: (config: ConfigService) => {
         return {
@@ -24,9 +27,6 @@ import { PassportModule } from '@nestjs/passport';
         };  
       },
       inject: [ConfigService],
-    }),
-    ConfigModule.forRoot({
-      isGlobal: true,
     }),
   ],
   controllers: [AuthController],
