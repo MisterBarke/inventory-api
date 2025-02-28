@@ -12,15 +12,38 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
-  
+
 model Users {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  email    String  @unique
-  name     String?
-  password String
-  createdAt DateTime @default(now())
-  refresh_token              String?
-  role                       Role
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  email         String     @unique
+  name          String?
+  password      String
+  createdAt     DateTime   @default(now())
+  refresh_token String?
+  role          Role
+  items         Items[]
+  category      Categories[]
+}
+
+model Items {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String    @unique
+  quantity    Int?
+  createdAt   DateTime  @default(now())
+  createdById String    @db.ObjectId
+  createdBy   Users     @relation(fields: [createdById], references: [id])
+  updatedAt   DateTime  @updatedAt
+  category    Categories? @relation(fields: [categoryId], references: [id])
+  categoryId  String?   @db.ObjectId
+}
+
+model Categories {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  createdBy   Users    @relation(fields: [createdById], references: [id])
+  createdById String   @db.ObjectId
+  updatedAt   DateTime @updatedAt
+  items       Items[]
 }
 
 enum Role {

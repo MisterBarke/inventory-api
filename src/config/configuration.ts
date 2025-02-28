@@ -4,7 +4,7 @@ const bool = (val: string | undefined, bool: boolean): boolean =>
   val == null ? bool : val == 'true';
 
 export default () => ({
-  port: int(process.env.PORT, 5000),
+  port: int(process.env.PORT, 8000),
   database: process.env.MONGODB_STRING,
   db: {
     host: process.env.HOST,
