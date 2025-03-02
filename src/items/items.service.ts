@@ -63,9 +63,9 @@ export class ItemsService {
         return deletedItem
     }
 
-    async updateItem(categoryId: string, dto: AddItemDto) {
+    async updateItem(itemId: string, categoryId: string, dto: AddItemDto) {
         const updatedItem = await this.prisma.items.update({
-             where: { id:categoryId },
+             where: { id:itemId },
               data: {
                 name: dto.name ?? dto.name, 
                 quantity: dto.quantity ?? dto.quantity,
