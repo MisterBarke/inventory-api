@@ -12,6 +12,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ItemsService } from './items/items.service';
+import { ServiceController } from './service/service.controller';
+import { ItemsController } from './items/items.controller';
+import { ItemsModule } from './items/items.module';
 
 @Module({
   imports: [
@@ -31,8 +35,9 @@ import { CategoriesModule } from './categories/categories.module';
       inject: [ConfigService],
     }),
     CategoriesModule,
+    ItemsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, ServiceController, ItemsController],
   providers: [
     AppService,
     JwtStrategy,
@@ -44,6 +49,7 @@ import { CategoriesModule } from './categories/categories.module';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    ItemsService,
   ],
 })
 export class AppModule {}

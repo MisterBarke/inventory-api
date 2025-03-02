@@ -29,6 +29,8 @@ model Items {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String    @unique
   quantity    Int?
+  unitPrice   Int?
+  itemsTotal  Int?
   createdAt   DateTime  @default(now())
   createdById String    @db.ObjectId
   createdBy   Users     @relation(fields: [createdById], references: [id])
@@ -39,11 +41,12 @@ model Items {
 
 model Categories {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
+  title       String   @unique
   createdBy   Users    @relation(fields: [createdById], references: [id])
   createdById String   @db.ObjectId
   updatedAt   DateTime @updatedAt
   items       Items[]
+  total       Int?
 }
 
 enum Role {
