@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import { validationError } from './filters/validation.errors';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 dotenv.config();
 
@@ -19,6 +20,16 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v1');
   setupSwagger(app);
+  const config = new DocumentBuilder()
+  .setTitle('API de gestion des catégories et items')
+  .setDescription('Documentation de l’API pour gérer les catégories et les items')
+  .setVersion('1.0')
+  .addBearerAuth() // Si tu utilises l'authentification JWT
+  .build();
+
+const document = SwaggerModule.createDocument(app, config);
+SwaggerModule.setup('api/docs', app, document);
+
   const configService = app.get(ConfigService);
   app.useGlobalPipes(
     new ValidationPipe({
