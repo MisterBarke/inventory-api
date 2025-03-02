@@ -22,4 +22,4 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     console.log('JWT_SECRET in strategy.ts:', configService.get<string>('JWT_SECRET'));
     return { ...payload };
   }
-}s
+}

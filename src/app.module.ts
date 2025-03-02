@@ -13,9 +13,9 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ItemsService } from './items/items.service';
-import { ServiceController } from './service/service.controller';
 import { ItemsController } from './items/items.controller';
 import { ItemsModule } from './items/items.module';
+import { CategoriesController } from './categories/categories.controller';
 
 @Module({
   imports: [
@@ -37,7 +37,7 @@ import { ItemsModule } from './items/items.module';
     CategoriesModule,
     ItemsModule,
   ],
-  controllers: [AppController, ServiceController, ItemsController],
+  controllers: [AppController, CategoriesController, ItemsController],
   providers: [
     AppService,
     JwtStrategy,
