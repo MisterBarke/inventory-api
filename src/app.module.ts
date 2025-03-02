@@ -37,7 +37,7 @@ import { CategoriesController } from './categories/categories.controller';
     CategoriesModule,
     ItemsModule,
   ],
-  controllers: [AppController, CategoriesController, ItemsController],
+  controllers: [AppController],
   providers: [
     AppService,
     JwtStrategy,
