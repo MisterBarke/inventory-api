@@ -19,10 +19,10 @@ async function bootstrap() {
   await app.init();
 
   app.setGlobalPrefix('api/v1');
-  setupSwagger(app);
+  //setupSwagger(app);
   const config = new DocumentBuilder()
-  .setTitle('API de gestion des catégories et items')
-  .setDescription('Documentation de l’API pour gérer les catégories et les items')
+  .setTitle('API de gestion du stock')
+  .setDescription('Documentation de l’API pour gérer le stock')
   .setVersion('1.0')
   .addBearerAuth() // Si tu utilises l'authentification JWT
   .build();
