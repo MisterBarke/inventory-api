@@ -21,14 +21,14 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
   //setupSwagger(app);
   const config = new DocumentBuilder()
-  .setTitle('API de gestion du stock')
-  .setDescription('Documentation de l’API pour gérer le stock')
+  .setTitle('API de gestion de stock')
+  .setDescription('API description')
   .setVersion('1.0')
-  .addBearerAuth() // Si tu utilises l'authentification JWT
   .build();
-
+  
 const document = SwaggerModule.createDocument(app, config);
-SwaggerModule.setup('api/docs', app, document);
+SwaggerModule.setup('api', app, document);
+
 
   const configService = app.get(ConfigService);
   app.useGlobalPipes(
