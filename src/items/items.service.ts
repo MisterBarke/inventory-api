@@ -75,4 +75,18 @@ export class ItemsService {
         await this.updateTotals(categoryId);
         return updatedItem
     }
+
+    async getAllItems (userId: string){
+       const connectedUser = await this.prisma.users.findUnique({
+        where:{id:userId}
+       })
+       const allItems = await this.prisma.items.findMany({
+        where:{
+            createdBy:{
+                id: connectedUser?.id
+            }
+        }
+       })
+       return allItems
+    }
 }

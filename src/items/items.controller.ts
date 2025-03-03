@@ -116,4 +116,39 @@ export class ItemsController {
         @Body() dto: AddItemDto) {
       return this.itemsService.updateItem(itemId, categoryId, dto);
     }
+
+    @ApiCreatedResponse({ description: 'Update a category' })
+    @ApiResponse({
+      status: 200,
+      description: 'Category updated',
+    })
+    @ApiResponse({ status: 400, description: 'Bad Request' })
+    @ApiResponse({ status: 404, description: 'Not Found' })
+    @ApiResponse({ status: 500, description: 'Server Error' })
+    @ApiBody({ type: AddItemDto })
+    @ApiOperation({
+      operationId: 'updateCategory',
+      requestBody: {
+        content: {
+          'multipart/form-data': {
+            encoding: {
+              about: {
+                contentType: 'application/json',
+              },
+            },
+            schema: {
+              type: 'object',
+              properties: {
+                about: { type: 'array', items: { type: 'number' } },
+              },
+            },
+          },
+        },
+      },
+    })
+    @Get('')
+    getAllItems(
+        @Req() request) {
+      return this.itemsService.getAllItems(request.user.id);
+    }
 }
