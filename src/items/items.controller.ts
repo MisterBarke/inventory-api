@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
 import { ApiBody, ApiCreatedResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AddItemDto } from 'src/auth/dto/addItem.dto';
 import { ItemsService } from './items.service';
@@ -37,6 +37,9 @@ export class ItemsController {
     })
     @Post(':id')
     addItem(@Body() dto: AddItemDto, @Req() request, @Param('id') id: string) {
+        console.log(request.user);
+        console.log(id);
+        
       return this.itemsService.addItem(dto, request.user.id, id);
     }
 
@@ -106,7 +109,7 @@ export class ItemsController {
         },
       },
     })
-    @Post(':itemId/category/:categoryId')
+    @Put(':itemId/category/:categoryId')
     updateItem(
         @Param('categoryId') categoryId: string,
         @Param('itemId') itemId: string,

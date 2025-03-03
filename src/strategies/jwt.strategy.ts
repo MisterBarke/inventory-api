@@ -19,7 +19,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any) {
     const app = await NestFactory.create(AppModule);
     const configService = app.get(ConfigService);
-    console.log('JWT_SECRET in strategy.ts:', configService.get<string>('JWT_SECRET'));
     return { ...payload };
   }
 }
