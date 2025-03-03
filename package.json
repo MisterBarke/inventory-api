@@ -30,7 +30,7 @@
     "@nestjs/swagger": "^11.0.6",
     "@nestjs/throttler": "^6.4.0",
     "@prisma/client": "^6.4.1",
-    "@vercel/node": "^5.1.9",
+    "@vercel/node": "^2.3.0",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -44,7 +44,7 @@
     "prisma": "^6.4.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "swagger": "^0.7.5",
+    "swagger": "^0.0.1",
     "swagger-ui-express": "^5.0.1",
     "throttler": "^0.0.1"
   },
