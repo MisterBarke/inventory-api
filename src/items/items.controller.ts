@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req } from '@nestjs/common';
 import { ApiBody, ApiCreatedResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AddItemDto } from 'src/auth/dto/addItem.dto';
 import { ItemsService } from './items.service';
@@ -151,4 +151,22 @@ export class ItemsController {
         @Req() request) {
       return this.itemsService.getAllItems(request.user.id);
     }
+
+    @Patch(':itemId/remove-stock/:categoryId')
+async removeStock(
+  @Param('id') itemId: string,
+  @Param('categoryId') categoryId: string,
+  @Body('quantity') quantityToRemove: number,
+  @Req() req
+) {
+  const userId = req.user.id; 
+  return this.itemsService.removeFromStock(itemId, quantityToRemove, userId, categoryId);
+}
+
+@Get('history')
+async getHistory() {
+  return this.itemsService.getHistory();
+}
+
+
 }

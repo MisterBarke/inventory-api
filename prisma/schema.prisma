@@ -23,6 +23,7 @@ model Users {
   role          Role
   items         Items[]
   category      Categories[]
+  history       History[]
 }
 
 model Items {
@@ -37,6 +38,7 @@ model Items {
   updatedAt   DateTime  @updatedAt
   category    Categories? @relation(fields: [categoryId], references: [id])
   categoryId  String?   @db.ObjectId
+  history        History[]
 }
 
 model Categories {
@@ -48,6 +50,17 @@ model Categories {
   items       Items[]
   total       Int?
 }
+
+model History {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  itemId      String   @db.ObjectId
+  quantity    Int
+  userId      String   @db.ObjectId 
+  createdAt   DateTime @default(now())
+  item        Items    @relation(fields: [itemId], references: [id])
+  user        Users    @relation(fields: [userId], references: [id])
+}
+
 
 enum Role {
   USER //Simple utilisateur

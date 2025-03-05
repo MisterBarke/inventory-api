@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { connect } from 'http2';
 import { AddItemDto } from 'src/auth/dto/addItem.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -43,6 +43,23 @@ export class ItemsService {
         await this.updateTotals(categoryId);
         return newItem;
     }
+    async updateItemTotal(itemId: string) {
+        const item = await this.prisma.items.findUnique({
+            where: { id: itemId },
+            select: { quantity: true, unitPrice: true }
+        });
+    
+        if (!item) {
+            throw new NotFoundException('Item not found');
+        }
+    
+        const updatedTotal = (item.quantity || 0) * (item.unitPrice || 0);
+    
+        await this.prisma.items.update({
+            where: { id: itemId },
+            data: { itemsTotal: updatedTotal }
+        });
+    }
 
     async updateTotals(categoryId: string) {
         const total = await this.prisma.items.aggregate({
@@ -58,7 +75,7 @@ export class ItemsService {
 
     async deleteItem(itemId: string, categoryId: string) {
         const deletedItem = await this.prisma.items.delete({ where: { id: itemId } });
-
+        
         await this.updateTotals(categoryId);
         return deletedItem
     }
@@ -72,13 +89,14 @@ export class ItemsService {
                 unitPrice: dto.unitPrice ?? dto.unitPrice 
             } 
         })
+        await this.updateItemTotal(itemId);
         await this.updateTotals(categoryId);
         return updatedItem
     }
 
     async getAllItems (userId: string){
        const connectedUser = await this.prisma.users.findUnique({
-        where:{id:userId}
+        where:{id:userId}   
        })
        const allItems = await this.prisma.items.findMany({
         where:{
@@ -89,4 +107,58 @@ export class ItemsService {
        })
        return allItems
     }
+
+    async removeFromStock(itemId: string, quantityToRemove: number, userId: string, categoryId: string) {
+        const item = await this.prisma.items.findUnique({
+          where: { id: itemId },
+        });
+      
+        if (!item) {
+          throw new NotFoundException('Item not found');
+        }
+      
+        if (!item.quantity || item.quantity < quantityToRemove) {
+          throw new BadRequestException('Not enough stock available');
+        }
+      
+        // Mise à jour de la quantité en stock
+        const updatedItem = await this.prisma.items.update({
+          where: { id: itemId },
+          data: {
+            quantity: item.quantity - quantityToRemove,
+            itemsTotal: (item.quantity - quantityToRemove) * (item.unitPrice || 0),
+          },
+        });
+        await this.updateItemTotal(itemId);
+        await this.updateTotals(categoryId);
+
+        // Enregistrement dans l'historique
+        await this.prisma.history.create({
+          data: {
+            itemId,
+            quantity: quantityToRemove,
+            userId,
+          },
+        });
+      
+        return updatedItem;
+      }
+      
+      async getHistory() {
+        return this.prisma.history.findMany({
+          include: {
+            item: true, 
+            user: {
+              select: {
+                id: true,
+                name: true, 
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        });
+      }
+      
 }
