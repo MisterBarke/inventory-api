@@ -121,7 +121,7 @@ export class ItemsService {
           throw new BadRequestException('Not enough stock available');
         }
       
-        // Mise à jour de la quantité en stock
+        
         const updatedItem = await this.prisma.items.update({
           where: { id: itemId },
           data: {
@@ -132,7 +132,7 @@ export class ItemsService {
         await this.updateItemTotal(itemId);
         await this.updateTotals(categoryId);
 
-        // Enregistrement dans l'historique
+     
         await this.prisma.history.create({
           data: {
             itemId,
