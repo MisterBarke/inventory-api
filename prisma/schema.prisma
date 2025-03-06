@@ -53,11 +53,11 @@ model Categories {
 
 model History {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  itemId      String   @db.ObjectId
+  itemId      String?   @db.ObjectId
   quantity    Int?
   userId      String   @db.ObjectId 
   createdAt   DateTime @default(now())
-  item        Items    @relation(fields: [itemId], references: [id])
+  item        Items?    @relation(fields: [itemId], references: [id])
   user        Users    @relation(fields: [userId], references: [id])
   action      String
   oldValue    Json

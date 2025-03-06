@@ -109,6 +109,7 @@ export class ItemsService {
     }
 
     async deleteItem(itemId: string, categoryId: string, userId: string) {
+
         const deletedItem = await this.prisma.items.delete({ where: { id: itemId } });
         const connectedUser = await this.prisma.users.findUnique({
           where:{id: userId}
@@ -116,10 +117,14 @@ export class ItemsService {
         if (!connectedUser) {
           throw new NotFoundException("User not found");
         }
-        const modifiedFields = {
+        const deletedFields = {
           name: deletedItem.name,
           quantity: deletedItem.quantity,
           unitPrice: deletedItem.unitPrice,
+          user:{
+            userName: connectedUser?.name,
+            userId: connectedUser?.id
+          },
       };
 
         await this.prisma.history.create({
@@ -128,7 +133,7 @@ export class ItemsService {
               userId: connectedUser.id,
               action: "Deleted",
               newValue: {},
-              oldValue: modifiedFields,
+              oldValue: deletedFields,
               
           }
       });
