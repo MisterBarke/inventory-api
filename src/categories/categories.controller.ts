@@ -3,6 +3,7 @@ import { ApiBody, ApiCreatedResponse, ApiOperation, ApiResponse, ApiTags } from 
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from 'src/auth/dto/createCategory.dto';
 
+
 @ApiTags('categories')
 @Controller('categories')
 export class CategoriesController {

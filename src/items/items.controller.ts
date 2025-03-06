@@ -37,9 +37,6 @@ export class ItemsController {
     })
     @Post(':id')
     addItem(@Body() dto: AddItemDto, @Req() request, @Param('id') id: string) {
-        console.log(request.user);
-        console.log(id);
-        
       return this.itemsService.addItem(dto, request.user.id, id);
     }
 

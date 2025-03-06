@@ -59,6 +59,9 @@ model History {
   createdAt   DateTime @default(now())
   item        Items    @relation(fields: [itemId], references: [id])
   user        Users    @relation(fields: [userId], references: [id])
+  action      String
+  oldValue    String
+  newValue    String
 }
 
 

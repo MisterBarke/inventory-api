@@ -109,6 +109,11 @@ export class ItemsService {
     }
 
     async removeFromStock(itemId: string, quantityToRemove: number, userId: string, categoryId: string) {
+
+        if (!itemId) {
+            throw new BadRequestException('L\'ID de l\'article est requis');
+        }
+        
         const item = await this.prisma.items.findUnique({
           where: { id: itemId },
         });
