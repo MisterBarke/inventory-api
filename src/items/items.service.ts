@@ -9,14 +9,14 @@ export class ItemsService {
     constructor(private prisma: PrismaService) { }
 
 
-    async getModifiedFields(oldData: Record<string, any>, newData: Record<string, any>) {
+    async getModifiedFields(oldItem: Partial<Items>, updatedItem: Partial<Items>) {
       const modifiedFields: Record<string, any> = {};
     
-      for (const key in newData) {
-        if (oldData[key] !== newData[key]) {
+      for (const key in updatedItem) {
+        if (oldItem[key] !== updatedItem[key]) {
           modifiedFields[key] = {
-            old: oldData[key],
-            new: newData[key],
+            old: oldItem[key],
+            new: updatedItem[key],
           };
         }
       }

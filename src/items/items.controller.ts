@@ -167,6 +167,4 @@ async removeStock(
 async getHistory() {
   return this.itemsService.getHistory();
 }
-
-
 }
