@@ -54,14 +54,14 @@ model Categories {
 model History {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   itemId      String   @db.ObjectId
-  quantity    Int
+  quantity    Int?
   userId      String   @db.ObjectId 
   createdAt   DateTime @default(now())
   item        Items    @relation(fields: [itemId], references: [id])
   user        Users    @relation(fields: [userId], references: [id])
   action      String
-  oldValue    String
-  newValue    String
+  oldValue    Json
+  newValue    Json
 }
 
 

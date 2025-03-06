@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Items } from '@prisma/client';
 import { connect } from 'http2';
 import { AddItemDto } from 'src/auth/dto/addItem.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -7,6 +8,23 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ItemsService {
     constructor(private prisma: PrismaService) { }
 
+
+    async getModifiedFields(oldData: Record<string, any>, newData: Record<string, any>) {
+      const modifiedFields: Record<string, any> = {};
+    
+      for (const key in newData) {
+        if (oldData[key] !== newData[key]) {
+          modifiedFields[key] = {
+            old: oldData[key],
+            new: newData[key],
+          };
+        }
+      }
+    
+      return modifiedFields;
+    }
+
+    
     async addItem(dto: AddItemDto, userId: string, categoryId: string) {
         const connectedUser = await this.prisma.users.findUnique({
             where: {
@@ -39,16 +57,21 @@ export class ItemsService {
                 itemsTotal: itemsTotal
             }
 
-        })
+        });
+
+        const addedFields = {
+          name: newItem.name,
+          quantity: newItem.quantity,
+          unitPrice: newItem.unitPrice
+      };
 
         await this.prisma.history.create({
           data: {
               itemId: newItem.id,
               userId: userId,
               action: "Added",
-              newValue: JSON.stringify(newItem),
-              quantity: newItem.quantity ?? 0,
-              oldValue: ''
+              newValue: addedFields,
+              oldValue: {}
           }
       });
       await this.updateTotals(categoryId);
@@ -93,15 +116,19 @@ export class ItemsService {
         if (!connectedUser) {
           throw new NotFoundException("User not found");
         }
+        const modifiedFields = {
+          name: deletedItem.name,
+          quantity: deletedItem.quantity,
+          unitPrice: deletedItem.unitPrice,
+      };
 
         await this.prisma.history.create({
           data: {
               itemId: deletedItem.id,
               userId: connectedUser.id,
               action: "Deleted",
-              newValue: '',
-              quantity: deletedItem.quantity ?? 0,
-              oldValue: JSON.stringify(deletedItem),
+              newValue: {},
+              oldValue: modifiedFields,
               
           }
       });
@@ -110,7 +137,7 @@ export class ItemsService {
         return deletedItem
     }
 
-    async updateItem(itemId: string, categoryId: string, dto: AddItemDto, userId: string) {
+    async updateItem(itemId: string, categoryId: string, updateData: Partial<Items>, userId: string) {
       const connectedUser = await this.prisma.users.findUnique({
         where:{id: userId}
       })
@@ -121,29 +148,35 @@ export class ItemsService {
       const oldItem = await this.prisma.items.findUnique({
         where: { id: itemId },
     });
+    if (!oldItem) {
+      throw new NotFoundException("Item not found");
+    }
+
+    const filteredUpdateData = Object.fromEntries(
+      Object.entries(updateData).filter(([_, v]) => v !== undefined)
+    );
 
         const updatedItem = await this.prisma.items.update({
              where: { id:itemId },
-              data: {
-                name: dto.name ?? oldItem?.name, 
-                quantity: dto.quantity ?? oldItem?.quantity,
-                unitPrice: dto.unitPrice ?? oldItem?.unitPrice 
-            } 
+              data: filteredUpdateData
         })
+        const modifiedFields = this.getModifiedFields(oldItem, updatedItem);
 
-        await this.prisma.history.create({
-          data: {
+        if (Object.keys(modifiedFields).length > 0) {
+          await this.prisma.history.create({
+            data: {
               itemId,
-              userId: connectedUser.id,
-              action: "updated",
-              oldValue: JSON.stringify(oldItem),
-              newValue: JSON.stringify(updatedItem),
-              quantity: dto.quantity ?? oldItem?.quantity
-          }
-      });
+              userId,
+              action: "Updated",
+              oldValue: JSON.stringify(modifiedFields),
+              newValue: JSON.stringify(modifiedFields), 
+            },
+          });
+        }   
 
         await this.updateItemTotal(itemId);
         await this.updateTotals(categoryId);
+
         return updatedItem
     }
 
@@ -161,55 +194,55 @@ export class ItemsService {
        return allItems
     }
 
-    async removeFromStock(itemId: string, quantityToRemove: number, userId: string, categoryId: string) {
-      const connectedUser = await this.prisma.users.findUnique({
-        where:{id: userId}
-      })
-      if (!connectedUser) {
-        throw new NotFoundException("User not found");
-      }
-        if (!itemId) {
-            throw new BadRequestException('L\'ID de l\'article est requis');
-        }
-        
-        const item = await this.prisma.items.findUnique({
-          where: { id: itemId },
-        });
-      
-        if (!item) {
-          throw new NotFoundException('Item not found');
-        }
-      
-        if (!item.quantity || item.quantity < quantityToRemove) {
-          throw new BadRequestException('Not enough stock available');
-        }
-      
-        
-        const updatedItem = await this.prisma.items.update({
-          where: { id: itemId },
-          data: {
-            quantity: item.quantity - quantityToRemove,
-            itemsTotal: (item.quantity - quantityToRemove) * (item.unitPrice || 0),
-          },
-        });
-        await this.updateItemTotal(itemId);
-        await this.updateTotals(categoryId);
+              async removeFromStock(itemId: string, quantityToRemove: number, userId: string, categoryId: string) {
+                const connectedUser = await this.prisma.users.findUnique({
+                  where:{id: userId}
+                })
+                if (!connectedUser) {
+                  throw new NotFoundException("User not found");
+                }
+                  if (!itemId) {
+                      throw new BadRequestException('L\'ID de l\'article est requis');
+                  }
+                  
+                  const item = await this.prisma.items.findUnique({
+                    where: { id: itemId },
+                  });
+                
+                  if (!item) {
+                    throw new NotFoundException('Item not found');
+                  }
+                
+                  if (!item.quantity || item.quantity < quantityToRemove) {
+                    throw new BadRequestException('Not enough stock available');
+                  }
+                
+                  
+                  const updatedItem = await this.prisma.items.update({
+                    where: { id: itemId },
+                    data: {
+                      quantity: item.quantity - quantityToRemove,
+                      itemsTotal: (item.quantity - quantityToRemove) * (item.unitPrice || 0),
+                    },
+                  });
+                  await this.updateItemTotal(itemId);
+                  await this.updateTotals(categoryId);
 
-     
-        await this.prisma.history.create({
-          data: {
-            action: 'Retirer',
-            itemId,
-            quantity: quantityToRemove,
-            userId: connectedUser.id,
-            oldValue: JSON.stringify(item),
-            newValue: JSON.stringify(updatedItem)
-          },
-        });
-      
-        return updatedItem;
-      }
-      
+              
+                  await this.prisma.history.create({
+                    data: {
+                      action: 'Retirer',
+                      itemId,
+                      quantity: quantityToRemove,
+                      userId: connectedUser.id,
+                      oldValue: { quantity: item.quantity },
+                      newValue: { quantity: updatedItem.quantity },
+                    },
+                  });
+                
+                  return updatedItem;
+                }
+                
       async getHistory() {
         return this.prisma.history.findMany({
           include: {

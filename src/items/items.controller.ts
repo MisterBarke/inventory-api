@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req } from '@ne
 import { ApiBody, ApiCreatedResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AddItemDto } from 'src/auth/dto/addItem.dto';
 import { ItemsService } from './items.service';
+import { Items } from '@prisma/client';
 
 @Controller('items')
 export class ItemsController {
@@ -112,8 +113,8 @@ export class ItemsController {
         @Param('categoryId') categoryId: string,
         @Param('itemId') itemId: string,
         @Req() request,
-        @Body() dto: AddItemDto) {
-      return this.itemsService.updateItem(itemId, categoryId, dto, request.user.id);
+        @Body() updateData: Partial<Items>,) {
+      return this.itemsService.updateItem(itemId, categoryId, updateData, request.user.id);
     }
 
     @ApiCreatedResponse({ description: 'Update a category' })
