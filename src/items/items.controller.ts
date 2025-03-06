@@ -111,7 +111,7 @@ export class ItemsController {
     updateItem(
         @Param('categoryId') categoryId: string,
         @Param('itemId') itemId: string,
-        @Req() request
+        @Req() request,
         @Body() dto: AddItemDto) {
       return this.itemsService.updateItem(itemId, categoryId, dto, request.user.id);
     }
