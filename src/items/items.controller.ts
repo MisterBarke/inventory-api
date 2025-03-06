@@ -72,9 +72,10 @@ export class ItemsController {
     @Delete(':itemId/category/:categoryId')
     deleteItem(
         @Param('categoryId') categoryId: string,
-        @Param('itemId') itemId: string
+        @Param('itemId') itemId: string,
+        @Req() request
     ) {
-      return this.itemsService.deleteItem(itemId, categoryId);
+      return this.itemsService.deleteItem(itemId, categoryId, request.user.id);
     }
 
     @ApiCreatedResponse({ description: 'Update a category' })
@@ -110,8 +111,9 @@ export class ItemsController {
     updateItem(
         @Param('categoryId') categoryId: string,
         @Param('itemId') itemId: string,
+        @Req() request
         @Body() dto: AddItemDto) {
-      return this.itemsService.updateItem(itemId, categoryId, dto);
+      return this.itemsService.updateItem(itemId, categoryId, dto, request.user.id);
     }
 
     @ApiCreatedResponse({ description: 'Update a category' })

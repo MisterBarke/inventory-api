@@ -40,7 +40,19 @@ export class ItemsService {
             }
 
         })
-        await this.updateTotals(categoryId);
+
+        await this.prisma.history.create({
+          data: {
+              itemId: newItem.id,
+              userId: userId,
+              action: "Added",
+              newValue: JSON.stringify(newItem),
+              quantity: newItem.quantity ?? 0,
+              oldValue: ''
+          }
+      });
+      await this.updateTotals(categoryId);
+
         return newItem;
     }
     async updateItemTotal(itemId: string) {
@@ -73,22 +85,57 @@ export class ItemsService {
         });
     }
 
-    async deleteItem(itemId: string, categoryId: string) {
+    async deleteItem(itemId: string, categoryId: string, userId: string) {
         const deletedItem = await this.prisma.items.delete({ where: { id: itemId } });
+        const connectedUser = await this.prisma.users.findUnique({
+          where:{id: userId}
+        })
+        if (!connectedUser) {
+          throw new NotFoundException("User not found");
+        }
+
+        await this.prisma.history.create({
+          data: {
+              itemId: deletedItem.id,
+              userId: connectedUser.id,
+              action: "Deleted",
+              newValue: '',
+              quantity: deletedItem.quantity ?? 0,
+              oldValue: JSON.stringify(deletedItem),
+              
+          }
+      });
         
         await this.updateTotals(categoryId);
         return deletedItem
     }
 
-    async updateItem(itemId: string, categoryId: string, dto: AddItemDto) {
+    async updateItem(itemId: string, categoryId: string, dto: AddItemDto, userId: string) {
+
+      const oldItem = await this.prisma.items.findUnique({
+        where: { id: itemId },
+    });
+
         const updatedItem = await this.prisma.items.update({
              where: { id:itemId },
               data: {
-                name: dto.name ?? dto.name, 
-                quantity: dto.quantity ?? dto.quantity,
-                unitPrice: dto.unitPrice ?? dto.unitPrice 
+                name: dto.name ?? oldItem?.name, 
+                quantity: dto.quantity ?? oldItem?.quantity,
+                unitPrice: dto.unitPrice ?? oldItem?.unitPrice 
             } 
         })
+
+        await this.prisma.history.create({
+          data: {
+              itemId,
+              userId,
+              action: "updated",
+              oldValue: JSON.stringify(oldItem),
+              newValue: JSON.stringify(updatedItem),
+              quantity: dto.quantity ?? oldItem?.quantity
+          }
+      });
+
         await this.updateItemTotal(itemId);
         await this.updateTotals(categoryId);
         return updatedItem
@@ -140,9 +187,12 @@ export class ItemsService {
      
         await this.prisma.history.create({
           data: {
+            action: 'Retirer',
             itemId,
             quantity: quantityToRemove,
             userId,
+            oldValue: JSON.stringify(item),
+            newValue: JSON.stringify(updatedItem)
           },
         });
       
