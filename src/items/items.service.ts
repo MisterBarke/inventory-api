@@ -111,6 +111,12 @@ export class ItemsService {
     }
 
     async updateItem(itemId: string, categoryId: string, dto: AddItemDto, userId: string) {
+      const connectedUser = await this.prisma.users.findUnique({
+        where:{id: userId}
+      })
+      if (!connectedUser) {
+        throw new NotFoundException("User not found");
+      }
 
       const oldItem = await this.prisma.items.findUnique({
         where: { id: itemId },
@@ -128,7 +134,7 @@ export class ItemsService {
         await this.prisma.history.create({
           data: {
               itemId,
-              userId,
+              userId: connectedUser.id,
               action: "updated",
               oldValue: JSON.stringify(oldItem),
               newValue: JSON.stringify(updatedItem),
@@ -156,7 +162,12 @@ export class ItemsService {
     }
 
     async removeFromStock(itemId: string, quantityToRemove: number, userId: string, categoryId: string) {
-
+      const connectedUser = await this.prisma.users.findUnique({
+        where:{id: userId}
+      })
+      if (!connectedUser) {
+        throw new NotFoundException("User not found");
+      }
         if (!itemId) {
             throw new BadRequestException('L\'ID de l\'article est requis');
         }
@@ -190,7 +201,7 @@ export class ItemsService {
             action: 'Retirer',
             itemId,
             quantity: quantityToRemove,
-            userId,
+            userId: connectedUser.id,
             oldValue: JSON.stringify(item),
             newValue: JSON.stringify(updatedItem)
           },

@@ -153,7 +153,7 @@ export class ItemsController {
 
     @Patch(':itemId/remove-stock/:categoryId')
 async removeStock(
-  @Param('id') itemId: string,
+  @Param('itemId') itemId: string,
   @Param('categoryId') categoryId: string,
   @Body('quantity') quantityToRemove: number,
   @Req() req
