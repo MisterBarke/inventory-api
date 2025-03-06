@@ -43,16 +43,18 @@ export class CategoriesService {
         const connectedUser = await this.prisma.users.findUnique({where:{id: userId}});
         return this.prisma.categories.findUnique({
             where: { id: categoryId, createdBy: {id: connectedUser?.id}  },
-            include: { items: true } // Charge tous les items liés
+            include: { items: true } 
         });
     }
 
-    async deleteCategory (id: string){
-        return await this.prisma.categories.delete({where: {id}})
+    async deleteCategory (id: string, userId: string){
+        const connectedUser = await this.prisma.users.findUnique({where:{id: userId}});
+        return await this.prisma.categories.delete({where: {id, createdBy:{id: connectedUser?.id}}})
 
     }
 
-    async updateCategory(id:string, dto: CreateCategoryDto){
-        return await this.prisma.categories.update({where:{id}, data:{title: dto.title }})
+    async updateCategory(id:string, dto: CreateCategoryDto, userId: string){
+        const connectedUser = await this.prisma.users.findUnique({where:{id: userId}});
+        return await this.prisma.categories.update({where:{id, createdBy: {id: connectedUser?.id}}, data:{title: dto.title }})
     }
 }

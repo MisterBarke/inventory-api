@@ -248,8 +248,14 @@ export class ItemsService {
                   return updatedItem;
                 }
                 
-      async getHistory() {
+      async getHistory(userId: string) {
+        const connectedUser = await this.prisma.users.findUnique({
+          where:{id: userId}
+        })
         return this.prisma.history.findMany({
+          where:{
+            userId: connectedUser?.id
+          },
           include: {
             item: true, 
             user: {
@@ -258,6 +264,7 @@ export class ItemsService {
                 name: true, 
               },
             },
+            
           },
           orderBy: {
             createdAt: 'desc',

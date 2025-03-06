@@ -72,8 +72,8 @@ create(@Body() dto: CreateCategoryDto, @Req() request) {
   },
 })
 @Put(':id')
-update(@Param('id') id: string, @Body() dto: CreateCategoryDto ) {
-  return this.categoriesService.updateCategory(id, dto);
+update(@Param('id') id: string, @Body() dto: CreateCategoryDto, @Req() request ) {
+  return this.categoriesService.updateCategory(id, dto, request.user.id);
 }
 
 @ApiCreatedResponse({ description: 'Update a category' })
@@ -106,8 +106,8 @@ update(@Param('id') id: string, @Body() dto: CreateCategoryDto ) {
   },
 })
 @Delete(':id')
-deleteCategory(@Param('id') id: string) {
-  return this.categoriesService.deleteCategory(id);
+deleteCategory(@Param('id') id: string, @Req() request) {
+  return this.categoriesService.deleteCategory(id, request.user.id);
 }
 
 @ApiCreatedResponse({ description: 'Update a category' })

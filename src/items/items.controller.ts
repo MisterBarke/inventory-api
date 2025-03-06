@@ -164,7 +164,7 @@ async removeStock(
 }
 
 @Get('history')
-async getHistory() {
-  return this.itemsService.getHistory();
+async getHistory(@Req() request) {
+  return this.itemsService.getHistory(request.user.id);
 }
 }
