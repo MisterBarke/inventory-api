@@ -68,6 +68,7 @@ export class ItemsService {
         await this.prisma.history.create({
           data: {
               itemId: newItem.id,
+              quantity: newItem.quantity,
               userId: userId,
               action: "Added",
               newValue: addedFields,
