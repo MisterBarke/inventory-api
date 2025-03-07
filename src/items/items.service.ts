@@ -199,6 +199,21 @@ export class ItemsService {
        return allItems
     }
 
+    async getOneItem (userId: string, itemId: string){
+      const connectedUser = await this.prisma.users.findUnique({
+       where:{id:userId}   
+      })
+      const item = await this.prisma.items.findUnique({
+       where:{
+        id: itemId,
+           createdBy:{
+               id: connectedUser?.id
+           }
+       }
+      })
+      return item
+   }
+
               async removeFromStock(itemId: string, quantityToRemove: number, userId: string, categoryId: string) {
                 const connectedUser = await this.prisma.users.findUnique({
                   where:{id: userId}

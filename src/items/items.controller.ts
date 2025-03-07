@@ -167,4 +167,10 @@ async removeStock(
 async getHistory(@Req() request) {
   return this.itemsService.getHistory(request.user.id);
 }
+
+@Get(':id')
+async getOneItem(@Req() request, @Param('id') itemId) {
+  return this.itemsService.getOneItem(request.user.id, itemId);
+}
+
 }
