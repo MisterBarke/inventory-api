@@ -190,8 +190,8 @@ export class ItemsService {
               itemId,
               userId,
               action: "Updated",
-              oldValue: Object.fromEntries(Object.entries({modifiedFields}).map(([key, val]) => [key, val.old])),
-              newValue: Object.fromEntries(Object.entries({modifiedFields}).map(([key, val]) => [key, val.new])),
+              oldValue: Object.fromEntries(Object.entries(modifiedFields).map(([key, val]) => [key, val.old])),
+              newValue: Object.fromEntries(Object.entries(modifiedFields).map(([key, val]) => [key, val.new])),
           }
       });
   
@@ -283,7 +283,7 @@ export class ItemsService {
         const connectedUser = await this.prisma.users.findUnique({
           where:{id: userId}
         })
-       /*  const historyRecords = */return await this.prisma.history.findMany({
+        const historyRecords = await this.prisma.history.findMany({
           where:{
             userId: connectedUser?.id
           },
@@ -301,11 +301,13 @@ export class ItemsService {
             createdAt: 'desc',
           },
         });
-       /*  const parsedHistory = historyRecords.map(record => ({
+        const parsedHistory = historyRecords.map(record => ({
           ...record,
           oldValue: typeof record.oldValue === "string" ? JSON.parse(record.oldValue) : record.oldValue,
           newValue: typeof record.newValue === "string" ? JSON.parse(record.newValue) : record.newValue,
-      })); */
+      }));
+
+      return parsedHistory
       }
       
 }
