@@ -190,8 +190,8 @@ export class ItemsService {
               itemId,
               userId,
               action: "Updated",
-              oldValue: JSON.stringify(Object.fromEntries(Object.entries(modifiedFields).map(([key, val]) => [key, val.old]))),
-              newValue: JSON.stringify(Object.fromEntries(Object.entries(modifiedFields).map(([key, val]) => [key, val.new]))),
+              oldValue: Object.fromEntries(Object.entries(modifiedFields).map(([key, val]) => [key, val.old])),
+              newValue: Object.fromEntries(Object.entries(modifiedFields).map(([key, val]) => [key, val.new])),
           }
       });
   
