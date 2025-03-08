@@ -145,46 +145,61 @@ export class ItemsService {
 
     async updateItem(itemId: string, categoryId: string, updateData: Partial<Items>, userId: string) {
       const connectedUser = await this.prisma.users.findUnique({
-        where:{id: userId}
-      })
+          where: { id: userId }
+      });
+  
       if (!connectedUser) {
-        throw new NotFoundException("User not found");
+          throw new NotFoundException("User not found");
       }
-
+  
       const oldItem = await this.prisma.items.findUnique({
-        where: { id: itemId },
-    });
-    if (!oldItem) {
-      throw new NotFoundException("Item not found");
-    }
-
-    const filteredUpdateData = Object.fromEntries(
-      Object.entries(updateData).filter(([_, v]) => v !== undefined)
-    );
-
-        const updatedItem = await this.prisma.items.update({
-             where: { id:itemId },
-              data: filteredUpdateData
-        })
-        const modifiedFields = this.getModifiedFields(oldItem, updatedItem);
-
-        if (Object.keys(modifiedFields).length > 0) {
-          await this.prisma.history.create({
-            data: {
+          where: { id: itemId }
+      });
+  
+      if (!oldItem) {
+          throw new NotFoundException("Item not found");
+      }
+  
+      // ✅ Définition des champs autorisés à être modifiés
+      const allowedFields = ["name", "quantity", "unitPrice"]; // Liste des champs modifiables
+      const filteredUpdateData = Object.fromEntries(
+          Object.entries(updateData).filter(([key, value]) => 
+              allowedFields.includes(key) && value !== undefined && value !== oldItem[key]
+          )
+      );
+  
+      // 📌 Si aucun champ n'est réellement modifié, ne pas faire de mise à jour
+      if (Object.keys(filteredUpdateData).length === 0) {
+          throw new BadRequestException("No changes detected");
+      }
+  
+      // ✅ Mettre à jour uniquement les champs modifiés
+      const updatedItem = await this.prisma.items.update({
+          where: { id: itemId },
+          data: filteredUpdateData
+      });
+  
+      // 📌 Récupérer les différences pour l'historique
+      const modifiedFields = Object.fromEntries(
+          Object.entries(filteredUpdateData).map(([key, newValue]) => [key, { old: oldItem[key], new: newValue }])
+      );
+  
+      // ✅ Enregistrer les modifications dans l'historique
+      await this.prisma.history.create({
+          data: {
               itemId,
               userId,
               action: "Updated",
-              oldValue: JSON.stringify(modifiedFields),
-              newValue: JSON.stringify(modifiedFields), 
-            },
-          });
-        }   
-
-        await this.updateItemTotal(itemId);
-        await this.updateTotals(categoryId);
-
-        return updatedItem
-    }
+              oldValue: JSON.stringify(Object.fromEntries(Object.entries(modifiedFields).map(([key, val]) => [key, val.old]))),
+              newValue: JSON.stringify(Object.fromEntries(Object.entries(modifiedFields).map(([key, val]) => [key, val.new]))),
+          }
+      });
+  
+      await this.updateItemTotal(itemId);
+      await this.updateTotals(categoryId);
+  
+      return updatedItem;
+  }
 
     async getAllItems (userId: string){
        const connectedUser = await this.prisma.users.findUnique({
