@@ -361,11 +361,11 @@ export class ItemsService {
         const allItems = await this.prisma.items.findMany({
           where: {
             createdBy: {id: userId},
-            quantity: { lte: 10 }
           },
         });
+        const lowStockItems = allItems.filter(item => item.quantity! < 10);
 
-        return allItems;
+        return lowStockItems;
       }
       
 }
