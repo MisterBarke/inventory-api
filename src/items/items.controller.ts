@@ -184,7 +184,7 @@ async getOneItem(@Req() request, @Param('id') itemId) {
   return this.itemsService.getOneItem(request.user.id, itemId);
 }
 
-@Get('low-stock')
+@Get('lowstock')
 getLowStockItems(@Req() request) {
   console.log(request.user);
   
