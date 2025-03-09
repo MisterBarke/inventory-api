@@ -163,6 +163,17 @@ async removeStock(
   return this.itemsService.removeFromStock(itemId, quantityToRemove, userId, categoryId);
 }
 
+@Patch(':itemId/add-stock/:categoryId')
+async addToStock(
+  @Param('itemId') itemId: string,
+  @Param('categoryId') categoryId: string,
+  @Body('quantity') quantityToAdd: number,
+  @Req() req
+) {
+  const userId = req.user.id; 
+  return this.itemsService.addToStock(itemId, quantityToAdd, userId, categoryId);
+}
+
 @Get('history')
 async getHistory(@Req() request) {
   return this.itemsService.getHistory(request.user.id);

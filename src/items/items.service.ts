@@ -70,7 +70,7 @@ export class ItemsService {
               itemId: newItem.id,
               quantity: newItem.quantity,
               userId: userId,
-              action: "Added",
+              action: "Added new",
               newValue: addedFields,
               oldValue: {}
           }
@@ -267,7 +267,7 @@ export class ItemsService {
               
                   await this.prisma.history.create({
                     data: {
-                      action: 'Retirer',
+                      action: 'RemovedFromStock',
                       itemId,
                       quantity: quantityToRemove,
                       userId: connectedUser.id,
@@ -278,6 +278,53 @@ export class ItemsService {
                 
                   return updatedItem;
                 }
+
+                async addToStock(itemId: string, quantityToAdd: number, userId: string, categoryId: string) {
+                  const connectedUser = await this.prisma.users.findUnique({
+                    where:{id: userId}
+                  })
+                  if (!connectedUser) {
+                    throw new NotFoundException("User not found");
+                  }
+                    if (!itemId) {
+                        throw new BadRequestException('L\'ID de l\'article est requis');
+                    }
+                    
+                    const item = await this.prisma.items.findUnique({
+                      where: { id: itemId },
+                    });
+                  
+                    if (!item) {
+                      throw new NotFoundException('Item not found');
+                    }
+                  
+                   
+                  
+                    
+                    const updatedItem = await this.prisma.items.update({
+                      where: { id: itemId },
+                      data: {
+                        quantity: item.quantity! + quantityToAdd,
+                        itemsTotal: (item.quantity! + quantityToAdd) * (item.unitPrice!),
+                      },
+                    });
+                    await this.updateItemTotal(itemId);
+                    await this.updateTotals(categoryId);
+  
+                
+                    await this.prisma.history.create({
+                      data: {
+                        action: 'Added To Stock',
+                        itemId,
+                        quantity: quantityToAdd,
+                        userId: connectedUser.id,
+                        oldValue: { quantity: item.quantity },
+                        newValue: { quantity: updatedItem.quantity },
+                      },
+                    });
+                  
+                    return updatedItem;
+                  }
                 
       async getHistory(userId: string) {
         const connectedUser = await this.prisma.users.findUnique({
