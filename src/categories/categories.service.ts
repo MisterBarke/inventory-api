@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { isEmpty } from 'class-validator';
 import { CreateCategoryDto } from 'src/auth/dto/createCategory.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -49,7 +50,27 @@ export class CategoriesService {
 
     async deleteCategory (id: string, userId: string){
         const connectedUser = await this.prisma.users.findUnique({where:{id: userId}});
-        return await this.prisma.categories.delete({where: {id, createdBy:{id: connectedUser?.id}}})
+        const category = await this.prisma.categories.findUnique({
+            where: { id },
+            include: { items: true } // Inclure les items associés
+          });
+        
+          if (!category) {
+            throw new NotFoundException("Catégorie introuvable");
+          }
+        
+          if (category.items.length > 0) {
+            throw new BadRequestException("Impossible de supprimer : La catégorie contient des produits.");
+          }
+        
+          // Suppression de la catégorie si elle est vide
+          return await this.prisma.categories.delete({
+            where: { id,
+                createdBy: {
+                    id: connectedUser?.id
+                }
+             }
+          });
 
     }
 

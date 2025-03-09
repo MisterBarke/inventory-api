@@ -357,7 +357,7 @@ export class ItemsService {
       return parsedHistory
       }
 
-      async getLowStockItems(threshold: number = 10, userId: string) {
+      async getLowStockItems(threshold: number, userId: string) {
         const connectedUser = await this.prisma.users.findUnique({where: {id: userId}})
         return this.prisma.items.findMany({
           where: {
