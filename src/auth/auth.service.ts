@@ -15,7 +15,7 @@ export class AuthService {
     }
 
     async register (dto: RegisterDto, role: Role = Role.ADMIN){
-
+      console.log('DTO reçu:', dto);
         const retreiveUser = await this.prisma.users.findUnique({
             where: {
               email: dto.email
