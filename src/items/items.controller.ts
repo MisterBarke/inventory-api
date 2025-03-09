@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req } from '@nestjs/common';
 import { ApiBody, ApiCreatedResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AddItemDto } from 'src/auth/dto/addItem.dto';
 import { ItemsService } from './items.service';
@@ -185,9 +185,7 @@ async getOneItem(@Req() request, @Param('id') itemId) {
 }
 
 @Get('/low-stock')
-getLowStockItems(@Body('quantity') threshold: number, @Req() request: any) {
-  return this.itemsService.getLowStockItems(threshold,request.user.id);
+getLowStockItems(@Query('quantity') threshold: number, @Req() request: any) {
+  return this.itemsService.getLowStockItems(Number(threshold) || 10, request.user.id);
 }
-
-
 }

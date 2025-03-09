@@ -72,4 +72,23 @@ export class AuthService {
           user: informationUser,
         };
       }
+
+      async updatePassword(id: string, password : string) {
+        const user = await this.prisma.users.findUnique({
+          where: {
+            id,
+          },
+        });
+        if (!user) throw new UnauthorizedException();
+        const saltOrRounds = 10;
+        const hash = await bcrypt.hash(password, saltOrRounds);
+        await this.prisma.users.update({
+          where: {
+            id,
+          },
+          data: {
+            password: hash,
+          },
+        });
+      }
 }
