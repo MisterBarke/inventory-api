@@ -32,6 +32,16 @@ export class RegisterDto {
       @IsString()
       @IsNotEmpty()
       password: string;
+
+      @ApiProperty({
+        type: 'string',
+        name: 'name',
+        description: 'la propriété name de type string',
+        default: 'companysoftart@gmail.com',
+      })
+      @IsString()
+      @IsNotEmpty()
+      name: string;
 }
 
 export class LoginDto {

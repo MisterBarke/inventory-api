@@ -14,7 +14,7 @@ export class AuthService {
 
     }
 
-    async register ({email, password}: RegisterDto, role: Role = Role.ADMIN){
+    async register ({email, password, name}: RegisterDto, role: Role = Role.ADMIN){
 
         const retreiveUser = await this.prisma.users.findUnique({
             where: {
@@ -25,7 +25,7 @@ export class AuthService {
           const saltOrRounds = 10;
           const hashedPassword = await bcrypt.hash(password, saltOrRounds);
         const newUser = await this.prisma.users.create({
-            data: {email, password: hashedPassword, role}
+            data: {email, password: hashedPassword, role, name}
         })
         return newUser
     }
