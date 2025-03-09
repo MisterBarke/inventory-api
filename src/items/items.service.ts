@@ -358,12 +358,8 @@ export class ItemsService {
       }
 
       async getLowStockItems(userId: string) {
-        const connectedUser = await this.prisma.users.findUnique({where: {id: userId}});
-
-        if (!connectedUser) {
-          throw new Error("Utilisateur introuvable");
-        }
-
+      console.log(userId);
+      
         return this.prisma.items.findMany({
           where: {
             createdBy: {id: userId},
