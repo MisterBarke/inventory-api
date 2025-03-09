@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto, RegisterDto } from './dto/create-user.dto';
 import { Role } from '@prisma/client';
 
+
 @Injectable()
 export class AuthService {
     constructor(
@@ -14,14 +15,25 @@ export class AuthService {
 
     }
 
+    private isValidPassword(password: string): boolean {
+      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6}$/;
+      return regex.test(password);
+    }
+
     async register (dto: RegisterDto, role: Role = Role.ADMIN){
-      console.log('DTO reçu:', dto);
+      
+      if (!this.isValidPassword(dto.password)) {
+        throw new HttpException('Le mot de passe doit contenir exactement 6 caractères alphanumériques avec au moins une majuscule, une minuscule et un chiffre.', 409);
+      };
+
         const retreiveUser = await this.prisma.users.findUnique({
             where: {
               email: dto.email
             },
           });
           if (retreiveUser) throw new HttpException('User already exist', 409);
+
+          
           const saltOrRounds = 10;
           const hashedPassword = await bcrypt.hash(dto.password, saltOrRounds);
         const newUser = await this.prisma.users.create({
@@ -79,6 +91,11 @@ export class AuthService {
       }
 
       async updatePassword(id: string, password : string) {
+
+        if (!this.isValidPassword(password)) {
+          throw new HttpException('Le mot de passe doit contenir exactement 6 caractères alphanumériques avec au moins une majuscule, une minuscule et un chiffre.', 409);
+        };
+
         const user = await this.prisma.users.findUnique({
           where: {
             id,
