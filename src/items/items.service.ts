@@ -363,16 +363,11 @@ export class ItemsService {
         if (!connectedUser) {
           throw new Error("Utilisateur introuvable");
         }
-
-        console.log('userIddddd', userId);
         
 
         return this.prisma.items.findMany({
           where: {
             createdBy: {id: userId},
-            quantity: {
-              lte: 10, // Récupère tous les produits avec une quantité ≤ threshold
-            },
           },
         });
       }
