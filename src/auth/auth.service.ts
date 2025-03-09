@@ -14,18 +14,23 @@ export class AuthService {
 
     }
 
-    async register ({email, password, name}: RegisterDto, role: Role = Role.ADMIN){
+    async register (dto: RegisterDto, role: Role = Role.ADMIN){
 
         const retreiveUser = await this.prisma.users.findUnique({
             where: {
-              email,
+              email: dto.email
             },
           });
           if (retreiveUser) throw new HttpException('User already exist', 409);
           const saltOrRounds = 10;
-          const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+          const hashedPassword = await bcrypt.hash(dto.password, saltOrRounds);
         const newUser = await this.prisma.users.create({
-            data: {email, password: hashedPassword, role, name}
+            data: {
+              email: dto.email,
+              password: hashedPassword,
+              name: dto.name,
+              role
+            }
         })
         return newUser
     }
