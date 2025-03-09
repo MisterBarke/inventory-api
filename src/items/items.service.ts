@@ -357,12 +357,8 @@ export class ItemsService {
       return parsedHistory
       }
 
-      async getLowStockItems(userId: string) {
-        const allItems = await this.prisma.items.findMany({
-          where: {
-            createdBy: {id: userId},
-          },
-        });
+      async getLowStockItems() {
+        const allItems = await this.prisma.items.findMany();
 
         const lowStockItems = allItems.filter(item => item.quantity! < 10);
 
