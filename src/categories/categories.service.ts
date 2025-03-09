@@ -32,6 +32,17 @@ export class CategoriesService {
                 }
             }
           })
+
+          await this.prisma.history.create({
+            data: {
+                categoryId: newCategory.id,
+                userId: userId,
+                action: "Added new",
+                newValue: newCategory.title,
+                oldValue: {}
+            }
+        });
+
           return newCategory;
     }
 
@@ -64,7 +75,7 @@ export class CategoriesService {
           }
         
           // Suppression de la catégorie si elle est vide
-          return await this.prisma.categories.delete({
+          const deletedCat = await this.prisma.categories.delete({
             where: { id,
                 createdBy: {
                     id: connectedUser?.id
@@ -72,10 +83,45 @@ export class CategoriesService {
              }
           });
 
+          const deletedFields = {
+           title: deletedCat.title,
+            user:{
+              userName: connectedUser?.name,
+              userId: connectedUser?.id
+            },
+        };
+
+        await this.prisma.history.create({
+            data: {
+                userId: userId,
+                action: "Deleted",
+                newValue: {},
+                oldValue: deletedFields
+            }
+        });
+
+        return deletedCat;
     }
 
     async updateCategory(id:string, dto: CreateCategoryDto, userId: string){
         const connectedUser = await this.prisma.users.findUnique({where:{id: userId}});
-        return await this.prisma.categories.update({where:{id, createdBy: {id: connectedUser?.id}}, data:{title: dto.title }})
+
+        const category = await this.prisma.categories.findUnique({
+            where: { id },
+          });
+
+        const updatedCat = await this.prisma.categories.update({where:{id, createdBy: {id: connectedUser?.id}}, data:{title: dto.title }});
+
+        await this.prisma.history.create({
+            data: {
+                categoryId: updatedCat.id,
+                userId: userId,
+                action: "Updated",
+                newValue: updatedCat.title,
+                oldValue: category!.title
+            }
+        });
+
+        return updatedCat;
     }
 }
