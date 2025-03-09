@@ -357,18 +357,18 @@ export class ItemsService {
       return parsedHistory
       }
 
-      async getLowStockItems(threshold: number, userId: string) {
+      async getLowStockItems(userId: string) {
         const connectedUser = await this.prisma.users.findUnique({where: {id: userId}});
 
         if (!connectedUser) {
           throw new Error("Utilisateur introuvable");
         }
-        
+
         return this.prisma.items.findMany({
           where: {
             createdBy: {id: userId},
             quantity: {
-              lte: threshold, // Récupère tous les produits avec une quantité ≤ threshold
+              lte: 10, // Récupère tous les produits avec une quantité ≤ threshold
             },
           },
         });

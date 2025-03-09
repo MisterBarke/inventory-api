@@ -185,7 +185,7 @@ async getOneItem(@Req() request, @Param('id') itemId) {
 }
 
 @Get('/low-stock')
-getLowStockItems(@Query('quantity') threshold: number, @Req() request: any) {
-  return this.itemsService.getLowStockItems(Number(threshold) || 10, request.user.id);
+getLowStockItems(@Req() request: any) {
+  return this.itemsService.getLowStockItems(request.user.id);
 }
 }
