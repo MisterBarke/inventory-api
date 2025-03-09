@@ -356,5 +356,17 @@ export class ItemsService {
 
       return parsedHistory
       }
+
+      async getLowStockItems(threshold: number = 10, userId: string) {
+        const connectedUser = await this.prisma.users.findUnique({where: {id: userId}})
+        return this.prisma.items.findMany({
+          where: {
+            createdBy: {id: connectedUser?.id},
+            quantity: {
+              lte: threshold, // Récupère tous les produits avec une quantité ≤ threshold
+            },
+          },
+        });
+      }
       
 }
