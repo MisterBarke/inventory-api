@@ -179,10 +179,10 @@ async getHistory(@Req() request) {
   return this.itemsService.getHistory(request.user.id);
 }
 
-/* @Get(':id/getone')
+@Get(':id/getone')
 async getOneItem(@Req() request, @Param('id') itemId) {
   return this.itemsService.getOneItem(request.user.id, itemId);
-} */
+}
 
 @Get('low-stock')
 async getLowStockItems(@Req() request){
