@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { isEmpty } from 'class-validator';
 import { CreateCategoryDto } from 'src/auth/dto/createCategory.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -38,7 +38,7 @@ export class CategoriesService {
                 categoryId: newCategory.id,
                 userId: userId,
                 action: "Added new",
-                newValue: JSON.stringify({ title: newCategory.title }),
+                newValue: { title: newCategory.title },
                 oldValue: {}
             }
         });
@@ -53,10 +53,15 @@ export class CategoriesService {
 
     async getOneCategory(categoryId: string, userId: string) {
         const connectedUser = await this.prisma.users.findUnique({where:{id: userId}});
-        return this.prisma.categories.findUnique({
+        const category = await this.prisma.categories.findUnique({
             where: { id: categoryId, createdBy: {id: connectedUser?.id}  },
             include: { items: true } 
         });
+
+        if(!category){
+            throw new NotFoundException("Catégorie introuvable");
+        }
+        return category
     }
 
     async deleteCategory (id: string, userId: string){
@@ -117,11 +122,10 @@ export class CategoriesService {
                 categoryId: updatedCat.id,
                 userId: userId,
                 action: "Updated",
-                newValue: JSON.stringify({ title: updatedCat.title }),
-                oldValue: JSON.stringify({title: category!.title})
+                newValue: { title: updatedCat.title },
+                oldValue: {title: category!.title}
             }
         });
-
         return updatedCat;
     }
 }
