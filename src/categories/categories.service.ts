@@ -38,7 +38,7 @@ export class CategoriesService {
                 categoryId: newCategory.id,
                 userId: userId,
                 action: "Added new",
-                newValue: newCategory.title,
+                newValue: JSON.stringify({ title: newCategory.title }),
                 oldValue: {}
             }
         });
@@ -117,8 +117,8 @@ export class CategoriesService {
                 categoryId: updatedCat.id,
                 userId: userId,
                 action: "Updated",
-                newValue: updatedCat.title,
-                oldValue: category!.title
+                newValue: JSON.stringify({ title: updatedCat.title }),
+                oldValue: JSON.stringify({title: category!.title})
             }
         });
 
