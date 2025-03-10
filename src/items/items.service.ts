@@ -8,7 +8,15 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ItemsService {
     constructor(private prisma: PrismaService) { }
 
-
+    private isValidJson(str: string): boolean {
+      try {
+          JSON.parse(str);
+          return true;
+      } catch (e) {
+          return false;
+      }
+  }
+  
     async getModifiedFields(oldItem: Partial<Items>, updatedItem: Partial<Items>) {
       const modifiedFields: Record<string, any> = {};
     
@@ -350,9 +358,14 @@ export class ItemsService {
         });
         const parsedHistory = historyRecords.map(record => ({
           ...record,
-          oldValue: typeof record.oldValue === "string" ? JSON.parse(record.oldValue) : record.oldValue,
-          newValue: typeof record.newValue === "string" ? JSON.parse(record.newValue) : record.newValue,
+          oldValue: typeof record.oldValue === "string" && this.isValidJson(record.oldValue) 
+              ? JSON.parse(record.oldValue) 
+              : record.oldValue,
+          newValue: typeof record.newValue === "string" && this.isValidJson(record.newValue) 
+              ? JSON.parse(record.newValue) 
+              : record.newValue,
       }));
+      
 
       return parsedHistory
       }
