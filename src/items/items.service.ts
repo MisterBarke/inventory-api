@@ -31,7 +31,7 @@ export class ItemsService {
                 id: userId
             }
         })
-        const existingItem = await this.prisma.items.findUnique({
+        const existingItem = await this.prisma.items.findFirst({
             where: {
                 name: dto.name,
                 categoryId: categoryId
