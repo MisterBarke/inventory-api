@@ -1,8 +1,8 @@
-import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';   
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto, RegisterDto } from './dto/create-user.dto';
+import { CreateCompanyDto, LoginDto, RegisterDto } from './dto/create-user.dto';
 import { Role } from '@prisma/client';
 
 
@@ -16,11 +16,11 @@ export class AuthService {
     }
 
     private isValidPassword(password: string): boolean {
-      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6}$/;
+      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/;
       return regex.test(password);
     }
 
-    async register (dto: RegisterDto, role: Role = Role.ADMIN){
+    async register (dto: RegisterDto, role: Role = Role.ADMIN, companyId: string){
       
       if (!this.isValidPassword(dto.password)) {
         throw new HttpException('Le mot de passe doit contenir exactement 6 caractères alphanumériques avec au moins une majuscule, une minuscule et un chiffre.', 409);
@@ -41,10 +41,32 @@ export class AuthService {
               email: dto.email,
               password: hashedPassword,
               name: dto.name,
-              role
+              role,
+              company: {connect: {id: companyId}}
             }
         })
         return newUser
+    }
+
+    async createCompany(dto: CreateCompanyDto){
+      let company = await this.prisma.company.findUnique({
+        where:{
+          name: dto.name
+        }
+      });
+      if(company) throw new HttpException('Company already exist', 409);
+      if(!company){
+        company = await this.prisma.company.create({
+          data: {
+            name: dto.name,
+          },
+        });
+      }
+      return company;
+    }
+
+    async getCompanies(){
+      return await this.prisma.company.findMany({include:{users:true}})
     }
 
     async signJwt(userId: string, payload) {

@@ -44,6 +44,18 @@ export class RegisterDto {
       name: string;
 }
 
+export class CreateCompanyDto{
+  @ApiProperty({
+    type: 'string',
+    name: 'name',
+    description: 'la propriété name de type string',
+    default: 'companysoftart@gmail.com',
+  })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+}
+
 export class LoginDto {
   @ApiProperty({
     type: 'string',

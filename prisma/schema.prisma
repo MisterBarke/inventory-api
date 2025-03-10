@@ -24,6 +24,15 @@ model Users {
   items         Items[]
   category      Categories[]
   history       History[]
+  companyId  String?   @db.ObjectId
+  company    Company?  @relation(fields: [companyId], references: [id])
+}
+
+model Company {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  createdAt DateTime @default(now())
+  users     Users[]
 }
 
 model Items {

@@ -1,9 +1,10 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from './dto/create-user.dto';
+import { CreateCompanyDto, LoginDto, RegisterDto } from './dto/create-user.dto';
 import { Public } from './decorators/public.decorator';
 import { Roles } from './decorators/role.decorator';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -16,10 +17,23 @@ export class AuthController {
     }
 
     @Roles('SUDO')
-    @Post('register')
-    register(@Body() registerDto: RegisterDto){
-      return  this.authService.register(registerDto)
+    @Post(':companyId/register')
+    register(@Body() registerDto: RegisterDto, @Param('companyId') companyId){
+      return  this.authService.register(registerDto, Role.ADMIN, companyId)
     }
+
+    @Roles('SUDO')
+    @Post('createCompany')
+    createCompany(@Body() createCompanyDto: CreateCompanyDto){
+      return  this.authService.createCompany(createCompanyDto)
+    }
+
+    @Roles('SUDO')
+    @Get('companies')
+    getCompanies(){
+      return  this.authService.getCompanies()
+    }
+
 
     @Post('password/update')
     @ApiBearerAuth()
