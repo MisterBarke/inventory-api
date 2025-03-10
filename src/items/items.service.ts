@@ -207,7 +207,7 @@ export class ItemsService {
        const allItems = await this.prisma.items.findMany({
         where:{
             createdBy:{
-                id: connectedUser?.id
+                companyId: connectedUser?.companyId
             }
         }
        })
@@ -222,7 +222,7 @@ export class ItemsService {
        where:{
         id: itemId,
            createdBy:{
-               id: connectedUser?.id
+               companyId: connectedUser?.companyId
            }
        }
       })
@@ -331,7 +331,9 @@ export class ItemsService {
         })
         const historyRecords = await this.prisma.history.findMany({
           where:{
-            userId: connectedUser?.id
+            user:{
+              companyId: connectedUser?.companyId
+            }
           },
           include: {
             item: true, 
@@ -357,10 +359,13 @@ export class ItemsService {
       }
 
       async getLowStockItems(userId: string) {
+        const connectedUser = await this.prisma.users.findUnique({
+          where:{id: userId}
+        })
         const allItems = await this.prisma.items.findMany({
           where:{
             createdBy:{
-              id: userId
+              companyId: connectedUser?.companyId
             }
           }
         });

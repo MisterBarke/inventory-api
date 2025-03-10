@@ -48,13 +48,13 @@ export class CategoriesService {
 
     async getCategories(userId: string){
         const connectedUser = await this.prisma.users.findUnique({where:{id: userId}});
-        return await this.prisma.categories.findMany({where: {createdBy: {id: connectedUser?.id}}, include:{items: true}})
+        return await this.prisma.categories.findMany({where: {createdBy: {companyId: connectedUser?.companyId}}, include:{items: true}})
     }
 
     async getOneCategory(categoryId: string, userId: string) {
         const connectedUser = await this.prisma.users.findUnique({where:{id: userId}});
         const category = await this.prisma.categories.findUnique({
-            where: { id: categoryId, createdBy: {id: connectedUser?.id}  },
+            where: { id: categoryId, createdBy: {companyId: connectedUser?.companyId}  },
             include: { items: true } 
         });
 
