@@ -19,7 +19,7 @@ export class AuthController {
     @Roles('SUDO')
     @Post(':companyId/register')
     register(@Body() registerDto: RegisterDto, @Param('companyId') companyId){
-      return  this.authService.register(registerDto, Role.ADMIN, companyId)
+      return  this.authService.register(registerDto, Role.SELLER, companyId)
     }
 
     @Roles('SUDO')

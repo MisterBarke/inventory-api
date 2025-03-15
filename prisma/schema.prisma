@@ -26,6 +26,9 @@ model Users {
   history       History[]
   companyId  String?   @db.ObjectId
   company    Company?  @relation(fields: [companyId], references: [id])
+  sales         Sales[]
+  invoices      Invoices[]
+  deliveries    Deliveries[] @relation("DeliveryAssigned")
 }
 
 model Company {
@@ -48,6 +51,7 @@ model Items {
   category    Categories? @relation(fields: [categoryId], references: [id])
   categoryId  String?   @db.ObjectId
   history        History[]
+  sale        SalesItems[]
 }
 
 model Categories {
@@ -61,6 +65,53 @@ model Categories {
   history     History[]
 }
 
+model Sales {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  sellerId    String     @db.ObjectId
+  custumerName String
+  custumerAddress String
+  seller      Users      @relation(fields: [sellerId], references: [id])
+  items       SalesItems[]       // Liste des produits vendus
+  totalAmount Int
+  discount    Int?
+  createdAt   DateTime   @default(now())
+  invoice     Invoices?
+  delivery    Deliveries?
+}
+
+model SalesItems {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  saleId   String  @db.ObjectId
+  itemId   String  @db.ObjectId
+  quantity Int
+  sale     Sales   @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  item     Items   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
+model Invoices {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  saleId      String   @unique @db.ObjectId
+  sale        Sales     @relation(fields: [saleId], references: [id])
+  sellerId    String   @db.ObjectId
+  seller      Users    @relation(fields: [sellerId], references: [id])
+  totalAmount Int
+  discount    Int?
+  finalAmount Int
+  taxAmount   Int?
+  createdAt   DateTime @default(now())
+}
+
+model Deliveries {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  saleId      String   @unique @db.ObjectId
+  sale        Sales     @relation(fields: [saleId], references: [id])
+  status      DeliveryStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deliveryManId String? @db.ObjectId  // Livreur assigné
+  deliveryMan   Users?  @relation("DeliveryAssigned", fields: [deliveryManId], references: [id])
+}
+
 model History {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   itemId      String?   @db.ObjectId
@@ -71,14 +122,30 @@ model History {
   item        Items?    @relation(fields: [itemId], references: [id])
   category    Categories?    @relation(fields: [categoryId], references: [id])
   user        Users    @relation(fields: [userId], references: [id])
-  action      String
+  action      HistoryAction
   oldValue    Json
   newValue    Json
 }
 
+enum DeliveryStatus {
+  PENDING     // En attente d’un livreur
+  IN_PROGRESS // En cours de livraison
+  DELIVERED   // Livraison terminée
+}
+
+enum HistoryAction {
+  SOLD     // En attente d’un livreur
+  DELETED // En cours de livraison
+  UPDATED   // Livraison terminée
+  REMOVEDFROMSTOCK
+  ADDEDTOSTOCK
+  ADDEDNEW
+  DELIVERY
+}
 
 enum Role {
-  USER //Simple utilisateur
+  SELLER //Simple utilisateur
   ADMIN //Admin
   SUDO //Développeur
+  DELIVERY  // Livreur
 }

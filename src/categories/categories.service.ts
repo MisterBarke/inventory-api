@@ -1,4 +1,5 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { HistoryAction } from '@prisma/client';
 import { isEmpty } from 'class-validator';
 import { CreateCategoryDto } from 'src/auth/dto/createCategory.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -37,7 +38,7 @@ export class CategoriesService {
             data: {
                 categoryId: newCategory.id,
                 userId: userId,
-                action: "Added new",
+                action: HistoryAction.ADDEDNEW,
                 newValue: { title: newCategory.title },
                 oldValue: {}
             }
@@ -99,7 +100,7 @@ export class CategoriesService {
         await this.prisma.history.create({
             data: {
                 userId: userId,
-                action: "Deleted",
+                action: HistoryAction.DELETED,
                 newValue: {},
                 oldValue: deletedFields
             }
@@ -121,7 +122,7 @@ export class CategoriesService {
             data: {
                 categoryId: updatedCat.id,
                 userId: userId,
-                action: "Updated",
+                action: HistoryAction.UPDATED,
                 newValue: { title: updatedCat.title },
                 oldValue: {title: category!.title}
             }

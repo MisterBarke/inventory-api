@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { Items } from '@prisma/client';
+import { HistoryAction, Items } from '@prisma/client';
 import { connect } from 'http2';
 import { AddItemDto } from 'src/auth/dto/addItem.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -69,7 +69,7 @@ export class ItemsService {
               itemId: newItem.id,
               quantity: newItem.quantity,
               userId: userId,
-              action: "Added new",
+              action: HistoryAction.ADDEDNEW,
               newValue: addedFields,
               oldValue: {}
           }
@@ -131,7 +131,7 @@ export class ItemsService {
           data: {
               itemId: deletedItem.id,
               userId: connectedUser.id,
-              action: "Deleted",
+              action: HistoryAction.DELETED,
               newValue: {},
               oldValue: deletedFields,
               
@@ -188,7 +188,7 @@ export class ItemsService {
           data: {
               itemId,
               userId,
-              action: "Updated",
+              action: HistoryAction.UPDATED,
               oldValue: Object.fromEntries(Object.entries(modifiedFields).map(([key, val]) => [key, val.old])),
               newValue: Object.fromEntries(Object.entries(modifiedFields).map(([key, val]) => [key, val.new])),
           }
@@ -266,7 +266,7 @@ export class ItemsService {
               
                   await this.prisma.history.create({
                     data: {
-                      action: 'RemovedFromStock',
+                      action: HistoryAction.REMOVEDFROMSTOCK,
                       itemId,
                       quantity: quantityToRemove,
                       userId: connectedUser.id,
@@ -313,7 +313,7 @@ export class ItemsService {
                 
                     await this.prisma.history.create({
                       data: {
-                        action: 'Added To Stock',
+                        action: HistoryAction.ADDEDTOSTOCK,
                         itemId,
                         quantity: quantityToAdd,
                         userId: connectedUser.id,
