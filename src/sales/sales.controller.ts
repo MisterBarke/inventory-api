@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
 import { CreateSaleDto } from './dto/createSale.dto';
 import { SalesService } from './sales.service';
 import { Role } from '@prisma/client';
@@ -27,5 +27,19 @@ getAllInvoices(@Req() request) {
 @Get(':id/get-one')
 getOneSale(@Req() request, @Param('id') saleId) {
   return this.salesService.getSaleById(request.user.id, saleId);
+}
+
+@Get('/total-sales')
+async getTotalSalesByPeriod(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string
+) {
+    if (!startDate || !endDate) {
+        throw new BadRequestException('startDate et endDate sont requis');
+    }
+// GET /total-sales?startDate=2025-03-01&endDate=2025-03-31
+    return { 
+        totalSales: await this.salesService.getTotalSalesByPeriod(new Date(startDate), new Date(endDate)) 
+    };
 }
 }

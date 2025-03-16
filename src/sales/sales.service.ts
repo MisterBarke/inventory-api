@@ -170,4 +170,19 @@ async getInvoices (userId: string){
         }
     })
 }
+
+async getTotalSalesByPeriod(startDate: Date, endDate: Date): Promise<number> {
+    const total = await this.prisma.sales.aggregate({
+        _sum: {
+            totalAmount: true
+        },
+        where: {
+            createdAt: {
+                gte: startDate, 
+                lte: endDate   
+            }
+        }
+    });
+    return total._sum.totalAmount || 0; 
+}
 }

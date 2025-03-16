@@ -74,7 +74,6 @@ export class ItemsService {
               oldValue: {}
           }
       });
-      await this.updateTotals(categoryId);
 
         return newItem;
     }
@@ -96,17 +95,6 @@ export class ItemsService {
         });
     }
 
-    async updateTotals(categoryId: string) {
-        const total = await this.prisma.items.aggregate({
-            _sum: { itemsTotal: true },
-            where: { categoryId: categoryId }
-        });
-
-        await this.prisma.categories.update({
-            where: { id: categoryId },
-            data: { total: total._sum.itemsTotal || 0 }
-        });
-    }
 
     async deleteItem(itemId: string, categoryId: string, userId: string) {
 
@@ -138,7 +126,7 @@ export class ItemsService {
           }
       });
         
-        await this.updateTotals(categoryId);
+        
         return deletedItem
     }
 
@@ -195,7 +183,7 @@ export class ItemsService {
       });
   
       
-      await this.updateTotals(categoryId);
+      
   
       return updatedItem;
   }
@@ -261,7 +249,7 @@ export class ItemsService {
                     },
                   });
                   await this.updateItemTotal(itemId);
-                  await this.updateTotals(categoryId);
+                  
 
               
                   await this.prisma.history.create({
@@ -308,7 +296,7 @@ export class ItemsService {
                       },
                     });
                     await this.updateItemTotal(itemId);
-                    await this.updateTotals(categoryId);
+                    
   
                 
                     await this.prisma.history.create({
@@ -372,4 +360,15 @@ export class ItemsService {
         const lowStockItems = allItems.filter(item => item.quantity! < 10);
         return lowStockItems;
       }
+
+      async getTotalItemsAmount(): Promise<number> {
+        const total = await this.prisma.items.aggregate({
+            _sum: {
+                itemsTotal: true
+            }
+        });
+    
+        return total._sum.itemsTotal || 0; // Retourne 0 si aucun itemsTotal n'est trouvé
+    }
+    
 }

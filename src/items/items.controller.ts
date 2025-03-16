@@ -193,4 +193,9 @@ async getOneItem(@Req() request, @Param('id') itemId) {
 async getLowStockItems(@Req() request){
   return this.itemsService.getLowStockItems(request.user.id)
 }
+
+@Get('total-amount')
+async getTotalItemsAmount(){
+  return this.itemsService.getTotalItemsAmount()
+}
 }
