@@ -96,7 +96,7 @@ export class ItemsService {
     }
 
 
-    async deleteItem(itemId: string, categoryId: string, userId: string) {
+    async deleteItem(itemId: string, userId: string) {
 
         const deletedItem = await this.prisma.items.delete({ where: { id: itemId } });
         const connectedUser = await this.prisma.users.findUnique({
@@ -130,7 +130,7 @@ export class ItemsService {
         return deletedItem
     }
 
-    async updateItem(itemId: string, categoryId: string, updateData: Partial<Items>, userId: string) {
+    async updateItem(itemId: string, updateData: Partial<Items>, userId: string) {
       const connectedUser = await this.prisma.users.findUnique({
           where: { id: userId }
       });
@@ -217,7 +217,7 @@ export class ItemsService {
       return item
    }
 
-              async removeFromStock(itemId: string, quantityToRemove: number, userId: string, categoryId: string) {
+              async removeFromStock(itemId: string, quantityToRemove: number, userId: string) {
                 const connectedUser = await this.prisma.users.findUnique({
                   where:{id: userId}
                 })
@@ -266,7 +266,7 @@ export class ItemsService {
                   return updatedItem;
                 }
 
-                async addToStock(itemId: string, quantityToAdd: number, userId: string, categoryId: string) {
+                async addToStock(itemId: string, quantityToAdd: number, userId: string) {
                   const connectedUser = await this.prisma.users.findUnique({
                     where:{id: userId}
                   })

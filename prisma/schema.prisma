@@ -61,7 +61,6 @@ model Categories {
   createdById String   @db.ObjectId
   updatedAt   DateTime @updatedAt
   items       Items[]
-  total       Int?
   history     History[]
 }
 

@@ -73,13 +73,12 @@ export class ItemsController {
       },
     })
     @Roles('ADMIN')
-    @Delete(':itemId/category/:categoryId')
+    @Delete(':itemId')
     deleteItem(
-        @Param('categoryId') categoryId: string,
         @Param('itemId') itemId: string,
         @Req() request
     ) {
-      return this.itemsService.deleteItem(itemId, categoryId, request.user.id);
+      return this.itemsService.deleteItem(itemId, request.user.id);
     }
 
     @ApiCreatedResponse({ description: 'Update a category' })
@@ -112,13 +111,12 @@ export class ItemsController {
       },
     })
     @Roles('ADMIN')
-    @Put(':itemId/category/:categoryId')
+    @Put(':itemId')
     updateItem(
-        @Param('categoryId') categoryId: string,
         @Param('itemId') itemId: string,
         @Req() request,
         @Body() updateData: Partial<Items>,) {
-      return this.itemsService.updateItem(itemId, categoryId, updateData, request.user.id);
+      return this.itemsService.updateItem(itemId, updateData, request.user.id);
     }
 
     @ApiCreatedResponse({ description: 'Update a category' })
@@ -157,26 +155,24 @@ export class ItemsController {
     }
 
     @Roles('ADMIN')
-    @Patch(':itemId/remove-stock/:categoryId')
+    @Patch(':itemId/remove-stock')
 async removeStock(
   @Param('itemId') itemId: string,
-  @Param('categoryId') categoryId: string,
   @Body('quantity') quantityToRemove: number,
   @Req() req
 ) {
   const userId = req.user.id; 
-  return this.itemsService.removeFromStock(itemId, quantityToRemove, userId, categoryId);
+  return this.itemsService.removeFromStock(itemId, quantityToRemove, userId);
 }
 @Roles('ADMIN')
-@Patch(':itemId/add-stock/:categoryId')
+@Patch(':itemId/add-stock')
 async addToStock(
   @Param('itemId') itemId: string,
-  @Param('categoryId') categoryId: string,
   @Body('quantity') quantityToAdd: number,
   @Req() req
 ) {
   const userId = req.user.id; 
-  return this.itemsService.addToStock(itemId, quantityToAdd, userId, categoryId);
+  return this.itemsService.addToStock(itemId, quantityToAdd, userId);
 }
 
 @Get('history')
