@@ -146,6 +146,8 @@ export class ItemsService {
       if (!oldItem) {
           throw new NotFoundException("Item not found");
       }
+
+      
   
       //Définition des champs autorisés à être modifiés
       const allowedFields = ["name", "quantity", "unitPrice"]; // Liste des champs modifiables
@@ -159,13 +161,15 @@ export class ItemsService {
       if (Object.keys(filteredUpdateData).length === 0) {
           throw new BadRequestException("No changes detected");
       }
-      await this.updateItemTotal(itemId);
-  
+     
+      
       // Mettre à jour uniquement les champs modifiés
       const updatedItem = await this.prisma.items.update({
           where: { id: itemId },
           data: filteredUpdateData
       });
+
+      await this.updateItemTotal(itemId);
   
       // Récupérer les différences pour l'historique
       const modifiedFields = Object.fromEntries(

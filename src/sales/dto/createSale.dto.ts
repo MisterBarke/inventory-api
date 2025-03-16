@@ -9,7 +9,6 @@ class ItemQuantityDto {
     @Min(1) // La quantité doit être au moins 1
     quantity: number;
   }
-
   export class CreateSaleDto {
     @IsString()
     @IsNotEmpty()
