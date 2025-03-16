@@ -3,6 +3,7 @@ import { ApiBody, ApiCreatedResponse, ApiOperation, ApiResponse } from '@nestjs/
 import { AddItemDto } from 'src/auth/dto/addItem.dto';
 import { ItemsService } from './items.service';
 import { Items } from '@prisma/client';
+import { Roles } from 'src/auth/decorators/role.decorator';
 
 @Controller('items')
 export class ItemsController {
@@ -36,6 +37,7 @@ export class ItemsController {
         },
       },
     })
+    @Roles('ADMIN')
     @Post(':id')
     addItem(@Body() dto: AddItemDto, @Req() request, @Param('id') id: string) {
       return this.itemsService.addItem(dto, request.user.id, id);
@@ -70,6 +72,7 @@ export class ItemsController {
         },
       },
     })
+    @Roles('ADMIN')
     @Delete(':itemId/category/:categoryId')
     deleteItem(
         @Param('categoryId') categoryId: string,
@@ -108,6 +111,7 @@ export class ItemsController {
         },
       },
     })
+    @Roles('ADMIN')
     @Put(':itemId/category/:categoryId')
     updateItem(
         @Param('categoryId') categoryId: string,
@@ -152,6 +156,7 @@ export class ItemsController {
       return this.itemsService.getAllItems(request.user.id);
     }
 
+    @Roles('ADMIN')
     @Patch(':itemId/remove-stock/:categoryId')
 async removeStock(
   @Param('itemId') itemId: string,
@@ -162,7 +167,7 @@ async removeStock(
   const userId = req.user.id; 
   return this.itemsService.removeFromStock(itemId, quantityToRemove, userId, categoryId);
 }
-
+@Roles('ADMIN')
 @Patch(':itemId/add-stock/:categoryId')
 async addToStock(
   @Param('itemId') itemId: string,

@@ -70,9 +70,14 @@ export class SalesService {
                     }))
                 },
                 totalAmount: totalAmountWithDiscount
-            }
+            },
         });
         
+        const saleWithItems = await this.prisma.sales.findUnique({
+            where: { id: newSale.id },
+            include: { items: {include:{item:true}} }
+        });
+
         const newInvoice = await this.prisma.invoices.create({
             data:{
                 saleId: newSale.id,
@@ -80,7 +85,7 @@ export class SalesService {
                 discount: discount ?? 0,
                 taxAmount: parseInt(process.env.TAX!, 10),
                 totalAmount: newSale.totalAmount,
-                finalAmount: (newSale.totalAmount*parseInt(process.env.TAX!, 10)/100),
+                finalAmount: newSale.totalAmount + (newSale.totalAmount*parseInt(process.env.TAX!, 10)/100),
             },
         })
 
@@ -100,9 +105,9 @@ export class SalesService {
         await this.prisma.history.create({
             data:{
                 action: HistoryAction.SOLD,
-                newValue: newSale,
+                newValue: saleWithItems!,
                 oldValue: {},
-                userId: sellerId
+                userId: sellerId,
             }
         })
 
@@ -126,7 +131,7 @@ async getSales (userId: string){
             }
         },
         include:{
-           items:true 
+           items:{include:{item:true}},
         }
     })
 }
@@ -160,8 +165,8 @@ async getInvoices (userId: string){
             }
         },
         include:{
-            sale:true,
-            seller: true
+            sale:{include:{items:{include:{item:true}}}},
+            seller: true,
         }
     })
 }

@@ -134,9 +134,9 @@ enum DeliveryStatus {
 }
 
 enum HistoryAction {
-  SOLD     // En attente d’un livreur
-  DELETED // En cours de livraison
-  UPDATED   // Livraison terminée
+  SOLD    
+  DELETED 
+  UPDATED   
   REMOVEDFROMSTOCK
   ADDEDTOSTOCK
   ADDEDNEW
