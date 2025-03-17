@@ -24,6 +24,11 @@ getAllInvoices(@Req() request) {
   return this.salesService.getInvoices(request.user.id);
 }
 
+@Get(':saleId/invoices')
+getAllInvoicesById(@Param('saleId') saleId ,@Req() request) {
+  return this.salesService.getInvoicesById(saleId, request.user.id);
+}
+
 @Get(':id/get-one')
 getOneSale(@Req() request, @Param('id') saleId) {
   return this.salesService.getSaleById(request.user.id, saleId);

@@ -172,6 +172,26 @@ async getInvoices (userId: string){
     })
 }
 
+async getInvoicesById (saleId: string, userId: string){
+    const connectedUser = await this.prisma.users.findUnique({
+        where:{
+            id:userId
+        }
+    })
+    return await this.prisma.invoices.findUnique({
+        where:{
+            saleId,
+            seller:{
+                companyId: connectedUser?.companyId
+            }
+        },
+        include:{
+            sale:{include:{items:{include:{item:true}}}},
+            seller: true,
+        }
+    })
+}
+
 async getTotalSalesByPeriod(startDate: Date, endDate: Date): Promise<number> {
     const total = await this.prisma.sales.aggregate({
         _sum: {
