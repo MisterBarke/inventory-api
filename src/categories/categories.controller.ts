@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
 import { ApiBody, ApiCreatedResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from 'src/auth/dto/createCategory.dto';
+import { CreateCategoryDto } from '../auth/dto/createCategory.dto';
 
 
 @ApiTags('categories')
