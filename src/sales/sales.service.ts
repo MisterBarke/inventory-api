@@ -78,20 +78,18 @@ export class SalesService {
             include: { items: {include:{item:true}} }
         });
 
-        const taxRate = parseInt(process.env.TAX || "0", 10);
-        const taxAmount = Math.round((totalAmountWithDiscount * taxRate) / 100);
-        const finalAmount = totalAmountWithDiscount + taxAmount;
 
         const newInvoice = await this.prisma.invoices.create({
             data:{
                 saleId: newSale.id,
                 sellerId,
                 discount: discount ?? 0,
-                taxAmount,
-                totalAmount: totalAmountWithDiscount,
-                finalAmount
+                taxAmount: parseInt(process.env.TAX!, 10),
+                totalAmount: newSale.totalAmount,
+                finalAmount: (newSale.totalAmount*parseInt(process.env.TAX!, 10)/100),
             },
         })
+        
 
         for (const { itemId, quantity } of items) {
             const product = products.find((p) => p.id === itemId);
