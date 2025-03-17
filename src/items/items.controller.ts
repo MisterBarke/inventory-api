@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req } from '@nestjs/common';
 import { ApiBody, ApiCreatedResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { AddItemDto } from 'src/auth/dto/addItem.dto';
+import { AddItemDto } from './dto/addItem.dto';
 import { ItemsService } from './items.service';
 import { Items } from '@prisma/client';
-import { Roles } from 'src/auth/decorators/role.decorator';
+import { Roles } from '../auth/decorators/role.decorator';
 
 @Controller('items')
 export class ItemsController {

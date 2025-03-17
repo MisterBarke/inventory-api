@@ -1,7 +1,7 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { HistoryAction } from '@prisma/client';
 import { isEmpty } from 'class-validator';
-import { CreateCategoryDto } from 'src/auth/dto/createCategory.dto';
+import { CreateCategoryDto } from 'src/categories/dto/createCategory.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()

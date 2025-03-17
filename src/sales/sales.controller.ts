@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req } f
 import { CreateSaleDto } from './dto/createSale.dto';
 import { SalesService } from './sales.service';
 import { Role } from '@prisma/client';
-import { Roles } from 'src/auth/decorators/role.decorator';
+import { Roles } from '../auth/decorators/role.decorator';
 
 @Controller('sales')
 export class SalesController {

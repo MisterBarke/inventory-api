@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { HistoryAction, Items } from '@prisma/client';
 import { connect } from 'http2';
-import { AddItemDto } from 'src/auth/dto/addItem.dto';
+import { AddItemDto } from 'src/items/dto/addItem.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
