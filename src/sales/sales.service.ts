@@ -83,9 +83,9 @@ export class SalesService {
                 saleId: newSale.id,
                 sellerId,
                 discount: discount ?? 0,
-                taxAmount: parseInt(process.env.TAX!, 10),
+                taxAmount: parseInt(process.env.TAX! || "0", 10),
                 totalAmount: newSale.totalAmount,
-                finalAmount: newSale.totalAmount + (newSale.totalAmount*parseInt(process.env.TAX!, 10)/100),
+                finalAmount: newSale.totalAmount + (newSale.totalAmount*parseInt(process.env.TAX! || "0", 10)/100),
             },
         })
 
