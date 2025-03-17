@@ -86,10 +86,9 @@ export class SalesService {
                 discount: discount ?? 0,
                 taxAmount: parseInt(process.env.TAX!, 10),
                 totalAmount: newSale.totalAmount,
-                finalAmount: (newSale.totalAmount*parseInt(process.env.TAX!, 10)/100),
+                finalAmount: newSale.totalAmount + (newSale.totalAmount*parseInt(process.env.TAX!, 10)/100),
             },
         })
-        
 
         for (const { itemId, quantity } of items) {
             const product = products.find((p) => p.id === itemId);
