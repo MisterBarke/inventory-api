@@ -8,14 +8,17 @@ export class SalesService {
     constructor(private prisma: PrismaService,) { }
 
 
+    async updateCategoryTotal(categoryId: string): Promise<number> {
+        const total = await this.prisma.items.aggregate({
+            where: { categoryId },
+            _sum: { itemsTotal: true }
+        });
+    
+        return total._sum.itemsTotal ?? 0;
+    }
+
     async createSale(createSaleDto: CreateSaleDto, sellerId: string) {
         const { custumerName, custumerAddress, items, discount } = createSaleDto;
-
-        const connectedUser = await this.prisma.users.findUnique({
-            where: {
-                id: sellerId,
-            },
-        });
 
         const productIds = items.map((item) => item.itemId);
 
@@ -100,6 +103,13 @@ export class SalesService {
                         itemsTotal: ((product.quantity ?? 0) - quantity) * (product.unitPrice ?? 0)
                     },
                 });
+                if (product.categoryId) {
+                    const newTotal = await this.updateCategoryTotal(product.categoryId); // Calculer le total
+                    await this.prisma.categories.update({
+                        where: { id: product.categoryId },
+                        data: { total: newTotal }
+                    });
+                }
             }
         }
 

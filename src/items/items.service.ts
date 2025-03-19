@@ -23,6 +23,17 @@ export class ItemsService {
       return modifiedFields;
     }
 
+    async updateCategoryTotal(categoryId: string) {
+      const total = await this.prisma.items.aggregate({
+          where: { categoryId },
+          _sum: { itemsTotal: true }
+      });
+  
+      await this.prisma.categories.update({
+          where: { id: categoryId },
+          data: { total: total._sum.itemsTotal ?? 0 }
+      });
+  }
     
     async addItem(dto: AddItemDto, userId: string, categoryId: string) {
         const connectedUser = await this.prisma.users.findUnique({
@@ -57,6 +68,8 @@ export class ItemsService {
             }
 
         });
+        
+        await this.updateCategoryTotal(categoryId)
 
         const addedFields = {
           name: newItem.name,
@@ -97,7 +110,11 @@ export class ItemsService {
 
 
     async deleteItem(itemId: string, userId: string) {
-
+        const itemToDelete = await this.prisma.items.findUnique({
+          where: {
+            id: itemId
+          }
+        })
         const deletedItem = await this.prisma.items.delete({ where: { id: itemId } });
         const connectedUser = await this.prisma.users.findUnique({
           where:{id: userId}
@@ -114,6 +131,8 @@ export class ItemsService {
             userId: connectedUser?.id
           },
       };
+
+      await this.updateCategoryTotal(itemToDelete?.categoryId!)
 
         await this.prisma.history.create({
           data: {
@@ -170,6 +189,7 @@ export class ItemsService {
       });
 
       await this.updateItemTotal(itemId);
+      await this.updateCategoryTotal(oldItem.categoryId!)
   
       // Récupérer les différences pour l'historique
       const modifiedFields = Object.fromEntries(
@@ -253,6 +273,7 @@ export class ItemsService {
                     },
                   });
                   await this.updateItemTotal(itemId);
+                  await this.updateCategoryTotal(updatedItem.categoryId!)
                   
 
               
@@ -300,6 +321,7 @@ export class ItemsService {
                       },
                     });
                     await this.updateItemTotal(itemId);
+                    await this.updateCategoryTotal(updatedItem.categoryId!)
                     
   
                 

@@ -28,7 +28,6 @@ model Users {
   company    Company?  @relation(fields: [companyId], references: [id])
   sales         Sales[]
   invoices      Invoices[]
-  deliveries    Deliveries[] @relation("DeliveryAssigned")
 }
 
 model Company {
@@ -57,6 +56,7 @@ model Items {
 model Categories {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String   @unique
+  total       Int?
   createdBy   Users    @relation(fields: [createdById], references: [id])
   createdById String   @db.ObjectId
   updatedAt   DateTime @updatedAt
@@ -107,8 +107,8 @@ model Deliveries {
   status      DeliveryStatus @default(PENDING)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  deliveryManId String? @db.ObjectId  // Livreur assigné
-  deliveryMan   Users?  @relation("DeliveryAssigned", fields: [deliveryManId], references: [id])
+  deliveryMan String
+  location    String
 }
 
 model History {
